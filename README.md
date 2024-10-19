@@ -1,22 +1,72 @@
-# Use the latest Python runtime as a parent image
-FROM python:3.12.4
+# Weather Monitoring System
 
-# Set environment variables (optional but recommended for production)
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
+## Overview
+This is a Flask-based rule engine application that allows users to create and evaluate rules based on specified conditions. The application features a user-friendly interface for entering rules and data, displaying evaluation results, and visualizing the internal representation of rules.
 
-# Set the working directory inside the container
-WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . .
+## Build Instructions
 
-# Upgrade pip and install dependencies
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+### Prerequisites
+- Docker or Podman
+- Python 3.12.4
+- Flask
+- SQLite
 
-# Make port 3000 available to the world outside this container
-EXPOSE 3000
 
-# Run the app using Gunicorn with eventlet for WebSocket support
-CMD ["python", "app:app"]
+### Setup
+1. **Clone the repository**
+    ```bash
+    git clone https://github.com/Syamsundarchegu/Zepto_Weather_Alert_Project.git
+
+    ```
+
+2. **Create a virtual environment**
+    ```bash
+
+    conda create -name <environment_name> #For creating a virtual environment
+    conda activate <environment_name>  #For activating the virtual environment
+    conda deacity <environment_name>  #For deactivating the virtual environment
+
+3. **Install dependencies**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. **Set up the database**
+    ```bash
+    python app.py  # This will initialize the database
+    ```
+
+5. **Run the application**
+    ```bash
+    python app.py
+    ```
+
+6. **Access the application**
+    Open your web browser and go to `http://127.0.0.1:3000`.
+
+
+### Docker Setup(Optional)
+1. **Build the Docker image**
+    ```bash
+
+    docker build -t -p <username>/<image_name>:latest .
+    docker run -d <username>/<image_name>:latest
+    docker ps -a
+    docker logs <container_object>
+    
+    ```
+
+2. **Run the Docker container**
+    ```bash
+    docker run -t -p 3000:3000 <username>/<image-name>:latest
+    ```
+
+## Maditory Step
+Access the application at `http://127.0.0.1:3000`.
+
+
+### Design Choices
+- **Flask**: Chosen for its simplicity and ease of use to create a web server.
+- **SQLite**: Lightweight database suitable for development and quick prototyping.
+- **Docker**: Ensures the application can run consistently across different environments.
