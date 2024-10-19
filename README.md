@@ -16,7 +16,7 @@ This is a Flask-based rule engine application that allows users to create and ev
 ### Setup
 1. **Clone the repository**
     ```bash
-    git clone https://github.com/Syamsundarchegu/Zepto_Weather_Alert_Project.git
+    git clone https://github.com/Syamsundarchegu/Zepto_ast_project.git
 
     ```
 
