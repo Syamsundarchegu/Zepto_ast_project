@@ -1,0 +1,161 @@
+ <!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Rule Engine</title>
+     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+     <style>
+         body {
+             padding-top: 50px;
+         }
+         .result {
+             margin-top: 20px;
+         }
+         .container {
+             max-width: 800px;
+         }
+         .card {
+             margin-bottom: 20px;
+         }
+         #rule-tree {
+             margin-top: 20px;
+             padding: 10px;
+             border: 1px solid #ccc;
+             background-color: #f8f9fa;
+         }
+     </style>
+ </head>
+ <body>
+     <div class="container">
+         <h1 class="text-center">Rule Engine</h1>
+         
+         <!-- Create Rule -->
+         <div class="card mt-4">
+             <div class="card-body">
+                 <h5 class="card-title">Create Rule</h5>
+                 <form id="create-rule-form">
+                     <div class="form-group">
+                         <label for="rule_string">Rule String</label>
+                         <input type="text" class="form-control" id="rule_string" placeholder="Enter rule string">
+                     </div>
+                     <button type="button" class="btn btn-success" id="create-rule-btn">Create Rule</button>
+                 </form>
+ 
+                 <div id="rule-tree" style="display: none;">
+                     <h5>Rule Structure:</h5>
+                     <pre id="rule-display"></pre>
+                 </div>
+             </div>
+         </div>
+ 
+         <!-- Evaluate Rule -->
+         <div class="card mt-4">
+             <div class="card-body">
+                 <h5 class="card-title">Evaluate Rule</h5>
+                 <form id="evaluate-rule-form">
+                     <div class="form-group">
+                         <label for="data">Data (JSON)</label>
+                         <input type="text" class="form-control" id="data" placeholder='{"age": 35, "department": "Sales", "salary": 60000, "experience": 3}'>
+                     </div>
+                     <button type="submit" class="btn btn-primary">Evaluate Rule</button>
+                 </form>
+             </div>
+         </div>
+ 
+         <!-- Results Section -->
+         <div id="result" class="result"></div>
+     </div>
+ 
+     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+     <script>
+         // Handle Create Rule button click
+         $('#create-rule-btn').on('click', function() {
+             const ruleString = $('#rule_string').val();
+             console.log('Creating rule:', { rule_string: ruleString }); // Debugging info
+             
+             // Create the rule (displaying it as text)
+             $('#rule-display').text(generateRuleTree(ruleString)); // Display rule tree
+             $('#rule-tree').show(); // Show the rule tree
+ 
+             // Save rule to database (if required)
+             $.ajax({
+                 url: '/create_rule', // Adjust this URL if needed
+                 method: 'POST',
+                 contentType: 'application/json',
+                 data: JSON.stringify({ rule_string: ruleString }),
+                 success: function(response) {
+                     console.log('Rule created:', response); // Debugging info
+                     $('#result').html(`<div class="alert alert-success">Rule created successfully!</div>`);
+                 },
+                 error: function() {
+                     alert('Failed to create rule.');
+                 }
+             });
+         });
+ 
+         // Function to generate a simple tree structure from the rule string
+         function generateRuleTree(ruleString) {
+             const precedence = {'AND': 2, 'OR': 1};
+             const tokens = ruleString.match(/\w+|[<>!=]=|AND|OR|\(|\)/g);
+             let output = [];
+             let opStack = [];
+             let operandStack = [];
+ 
+             function applyOperator() {
+                 const operator = opStack.pop();
+                 const right = operandStack.pop();
+                 const left = operandStack.pop();
+                 output.push({ operator, left, right });
+                 operandStack.push(output[output.length - 1]); // Push the constructed node back to operand stack
+             }
+ 
+             for (const token of tokens) {
+                 if (token === '(') {
+                     opStack.push(token);
+                 } else if (token === ')') {
+                     while (opStack.length && opStack[opStack.length - 1] !== '(') {
+                         applyOperator();
+                     }
+                     opStack.pop();
+                 } else if (precedence[token]) {
+                     while (opStack.length && precedence[opStack[opStack.length - 1]] >= precedence[token]) {
+                         applyOperator();
+                     }
+                     opStack.push(token);
+                 } else {
+                     operandStack.push(token);
+                 }
+             }
+             while (opStack.length) {
+                 applyOperator();
+             }
+ 
+             return JSON.stringify(output, null, 2);
+         }
+ 
+         // Handle Evaluate Rule form submission
+         $('#evaluate-rule-form').on('submit', function(e) {
+             e.preventDefault();
+             const data = $('#data').val();
+             
+             console.log('Evaluating rule:', { data: JSON.parse(data) }); // Debugging info
+             
+             $.ajax({
+                 url: '/evaluate_rule',
+                 method: 'POST',
+                 contentType: 'application/json',
+                 data: JSON.stringify({ rule_string: $('#rule_string').val(), data: JSON.parse(data) }), // Using the rule string directly
+                 success: function(response) {
+                     console.log('Evaluation result:', response); // Debugging info
+                     $('#result').html(`<div class="alert alert-info">Evaluation Result: ${response.result}</div>`);
+                 },
+                 error: function() {
+                     alert('Failed to evaluate rule.');
+                 }
+             });
+         });
+     </script>
+ </body>
+ </html>
+ 
