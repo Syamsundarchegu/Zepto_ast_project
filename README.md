@@ -51,7 +51,7 @@ This is a Flask-based rule engine application that allows users to create and ev
     ```bash
 
     docker build -t syamsundarchegu/zepto_ast:latest .
-    docker run -d syamsundarchegu/zepto_ast:latest
+    docker run -d -p 3000:3000 syamsundarchegu/zepto_ast:latest
     docker ps -a
     docker logs <container_object>
     
@@ -59,7 +59,7 @@ This is a Flask-based rule engine application that allows users to create and ev
 
 2. **Run the Docker container**
     ```bash
-    docker run -t -p 3000:3000 syamsundarchegu/zepto_ast:latest
+    docker run -d -p 3000:3000 syamsundarchegu/zepto_ast:latest
     ```
 
 ## Maditory Step
