@@ -50,7 +50,7 @@ This is a Flask-based rule engine application that allows users to create and ev
 1. **Build the Docker image**
     ```bash
 
-    docker build -t -p syamsundarchegu/zepto_ast:latest .
+    docker build -t syamsundarchegu/zepto_ast:latest .
     docker run -d syamsundarchegu/zepto_ast:latest
     docker ps -a
     docker logs <container_object>
